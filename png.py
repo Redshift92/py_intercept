@@ -1,12 +1,30 @@
 # -*- coding: utf-8 -*-
 # @Author: lorenzo
 # @Date:   2017-08-23 17:29:39
-# @Last Modified by:   lorenzo
-# @Last Modified time: 2017-09-06 13:47:59
+# @Last Modified by:   Lorenzo
+# @Last Modified time: 2017-09-13 16:45:41
+
+"""
+.. module:: png
+
+***
+PNG
+***
+
+Implementation of Proportitonal Navigation Guidance laws to be chosen as acceleration update methods
+for a Missile object.
+
+    """
 
 import numpy as np
 
 def ppn(self, sensed, dt):
+    """
+.. function:: ppn(self, sensed, dt)
+
+    Implementation of an Pure Proportional Navigation Guidance law.
+
+    """
     tpos = sensed['position']
     self.range = np.sqrt((tpos[1] - self.pos[1])**2 + (tpos[0] - self.pos[0])**2)
     if abs(tpos[0] - self.pos[0]) > 0.01:
@@ -24,6 +42,12 @@ def ppn(self, sensed, dt):
         self.prev_los_angle = self.los_angle
 
 def apng(self, sensed, dt):
+    """
+.. function:: apng(self, sensed, dt)
+
+    Implementation of an Augmented Proportional Navigation Guidance law.
+
+    """
     tpos, tacc = sensed['position'], sensed['acceleration']
     self.range = np.sqrt((tpos[1] - self.pos[1])**2 + (tpos[0] - self.pos[0])**2)
     if abs(tpos[0] - self.pos[0]) > 0.01:

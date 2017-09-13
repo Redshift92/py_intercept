@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: lorenzo
 # @Date:   2017-09-09 09:59:21
-# @Last Modified by:   lorenzo
-# @Last Modified time: 2017-09-09 10:18:27
+# @Last Modified by:   Lorenzo
+# @Last Modified time: 2017-09-11 09:29:56
 
 """
 .. module:: sensors_layers
@@ -11,7 +11,7 @@
 Sensors Layers
 **************
 
-Definitions of sensors layers updating retrieving players data with different sensors dynamics and
+Definitions of sensors layers retrieving players data with different sensors dynamics and
 characteristics.
 
     """

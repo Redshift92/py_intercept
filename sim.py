@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: lorenzo
 # @Date:   2017-08-21 13:24:31
-# @Last Modified by:   lorenzo
-# @Last Modified time: 2017-09-09 10:11:23
+# @Last Modified by:   Lorenzo
+# @Last Modified time: 2017-09-13 16:38:58
 
 """
 
@@ -19,13 +19,13 @@ import threading
 import argparse
 
 import numpy as np
-import pygame
 
 import unit_converter as uc
 import players
 import png
 import data_handlers as dh
 import visualizer as viz
+import sensors_layers
 
 
 class Simulator:
@@ -36,6 +36,25 @@ The Simulator class
 
 .. class:: Simulator(sscreen, plt, m0, t0, dt, rtf, tol, player_dim=(50,10))
 
+    Create a Simulator instance.
+    To have the Simulator correctly running the following parameters are needed:
+
+        * :samp:`sscreen` SimScreen instance to output Simulation animation;
+        * :samp:`plt`  Plotter instance to output Simulation data;
+        * :samp:`m0` Missile configuration info passed as a dictionary composed of the following keys:
+          ['pos', 'he', 'vel', 'guidance'] paired respectively with an (x,y) start position tuple,
+          heading error angle in degrees, start velocity and a string for desired guidance method;
+        * :samp:`t0` Target configuration info passed as a dictionary composed of the following keys:
+          ['pos', 'vel', 'acc'] paired respectively with an (x,y) start position tuple,
+          start velocity and acceleration;
+        * :samp:`dt` scalar value used as both integration and simulation step;
+        * :samp:`rtf` realtime factor with a value less than 1 to slow down the simulation without 
+          reducing the simulation step (i.e. a rft of 0.5 and a dt of 0.01 will make the simulation
+          animation run like a 2ms step one while the integration step is still 1ms);
+        * :samp:`tol` allowed tolerance on Missile/Target position difference to consider the
+          interception ended;
+        * :samp:`player_dim` a tuple representing Missile and Target representations dimensions in 
+          pixels. 
 
     """
     def __init__(self, sscreen, plt, m0, t0, dt, rtf, tol, player_dim=(50,10)):
@@ -48,7 +67,8 @@ The Simulator class
         losangle0 = np.arctan2(t0['pos'][1] - m0['pos'][1], t0['pos'][0] - m0['pos'][0])
         self.m = { 'player': players.Missile(m0['pos'], 
                                              losangle0 + np.radians(m0['he']),
-                                             m0['vel'], 0, m0['guidance']) }
+                                             m0['vel'], 0, m0['guidance'],
+                                             sensors_layers.PerfectSensors) }
         self.t = { 'player': players.Target(t0['pos'] , losangle0, t0['vel'], t0['acc']) }
 
         self.m['surface'] = viz.PlayerSurf(player_dim, losangle0 + np.radians(m0['he']))
@@ -63,7 +83,7 @@ The Simulator class
         """
 .. method:: loop()
 
-        
+        Start simulation loop.
         """
         while True:
             self._sscreen.clear()
@@ -119,19 +139,19 @@ The Simulator class
         """
 .. method:: key_listener()
 
-        
+        Listen to keyboard and ui events.
         """
         while not self.quit_event.is_set():
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event in self._sscreen.event.get():
+                if event.type == viz.event_type('QUIT'):
                     self.quit_event.set()
                     self.resume_event.set()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_s:
+                if event.type == viz.event_type('KEYDOWN'):
+                    if event.key == viz.event_key('s'):
                         self.resume_event.clear()
-                    if event.key == pygame.K_r:
+                    if event.key == viz.event_key('r'):
                         self.resume_event.set()
-                    if event.key == pygame.K_q:
+                    if event.key == viz.event_key('q'):
                         self.quit_event.set()
                         self.resume_event.set()
             time.sleep(0.01)
@@ -140,7 +160,7 @@ The Simulator class
         """
 .. method:: check_collision()
 
-        
+        Check missile and target collision under allowed tolerance condition.
         """
         return (self.m['player'].pos[0] > self.t['player'].pos[0] - self.tolerance and 
                 self.m['player'].pos[0] < self.t['player'].pos[0] + self.tolerance and 
@@ -151,9 +171,9 @@ The Simulator class
         """
 .. method:: pos2pix(pos)
 
-        
+        Conver a position tuple expressed in meters to a pixels tuple.
         """
-        return [int(uc.meters_to_pix(ppos)) for ppos in pos]
+        return tuple([int(uc.meters_to_pix(ppos)) for ppos in pos])
 
 
 parser = argparse.ArgumentParser(description='Simulator and plotter.')

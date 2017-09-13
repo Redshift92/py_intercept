@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: lorenzo
 # @Date:   2017-08-29 21:10:17
-# @Last Modified by:   lorenzo
-# @Last Modified time: 2017-08-30 11:15:36
+# @Last Modified by:   Lorenzo
+# @Last Modified time: 2017-09-12 19:41:18
 
 """
 .. module:: data_handlers
@@ -49,6 +49,7 @@ The Plotter class
                 * plot id string to access plot and add data to it subsequently
                 * plot title string
                 * curves list: a list composed of n elements corresponing to desired curves colors
+
         """
         for plot in plots_list:
             if plot == 'next_row':
@@ -64,6 +65,7 @@ The Plotter class
 .. method:: plots(plots_list)
 
         Return plot ids.
+
         """
         return list(self._plots.keys())
 
@@ -72,6 +74,7 @@ The Plotter class
 .. method:: set_data(plot, data, curve_index = 0)
 
         Plot :samp:`data` list to curve :samp:`curve_index` inside plot :samp:`plot`.
+
         """
         self._curves[plot][curve_index].setData(data)
 
@@ -80,6 +83,7 @@ The Plotter class
 .. method:: run()
 
         Start Qt Plotter Application.
+
         """
         self._app_inst.exec()
 
@@ -88,6 +92,7 @@ The Plotter class
 .. method:: quit()
 
         Quit Qt Plotter Application.
+
         """
         self._app_inst.exit()
 
@@ -98,6 +103,7 @@ def make_history(ids):
 .. function:: make_history(ids)
 
     Prepare a history dictionary with ids as keys and empty lists as values to keep data logs.
+
     """
     global history
     history = {mid: [] for mid in ids}

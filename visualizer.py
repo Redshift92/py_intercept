@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: lorenzo
 # @Date:   2017-09-09 10:09:40
-# @Last Modified by:   lorenzo
-# @Last Modified time: 2017-09-09 10:14:04
+# @Last Modified by:   Lorenzo
+# @Last Modified time: 2017-09-13 16:39:21
 
 
 """
@@ -130,6 +130,9 @@ The SimScreen class
 
         self._init_colors()
 
+        # wrap pygame events
+        self.event = pygame.event
+
         self._screen_size = screen_size
         self._screen = pygame.display.set_mode(screen_size)
         self.clear()
@@ -225,3 +228,21 @@ The SimScreen class
                 trc, brc = Point((pxh, pyh)).rotate(ori), Point((pxh, -pyh)).rotate(ori)
                 top_left += Point((abs(-pxh - trc.coords[0]), -pyh + brc.coords[1]))
         self._screen.blit(psurf.surf, self._pgs2ss_coords( top_left ) )
+
+def event_type(event):
+    """
+.. function:: event_type(event)
+
+        Return pygame event type.
+
+    """
+    return getattr(pygame, event)
+
+def event_key(event):
+    """
+.. function:: event_type(event)
+
+        Return pygame event key.
+
+    """
+    return getattr(pygame, 'K_' + event)
