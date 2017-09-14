@@ -2,7 +2,7 @@
 # @Author: lorenzo
 # @Date:   2017-09-09 09:59:21
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-11 09:29:56
+# @Last Modified time: 2017-09-13 16:52:33
 
 """
 .. module:: sensors_layers
@@ -35,7 +35,7 @@ The PerfectSensors class
         """
 .. method:: get_data(player)
 
-        Return player position and acceleration with no noise or delay,
-        
+        Return player position and acceleration with no noise or delay.
+
         """
-        return { 'position': player.pos, 'acceleration': player.acc }
+        return {'position': player.pos, 'acceleration': player.acc}

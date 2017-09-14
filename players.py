@@ -2,15 +2,25 @@
 # @Author: lorenzo
 # @Date:   2017-08-21 13:24:23
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-11 09:26:50
+# @Last Modified time: 2017-09-14 20:24:30
+
+"""
+.. module:: players
+
+*******
+Players
+*******
+
+Players are generic simulation objects.
+
+    """
 
 import types
 import numpy as np
 
-#TODO: acceleration only perpendicular to velocity in current 
-#      implementation, make generic
+#TODO: acceleration only perpendicular to velocity in current implementation, make generic
 
-class Player():
+class Player:
     """
 ================
 The Player class
@@ -62,7 +72,7 @@ class Missile(Player):
 The Missile class
 =================
 
-.. class:: Missile(pos, ori, vel, acc, update_fn, sensors_layer)
+.. class:: Missile(pos, ori, vel, acc, guidance_data, sensors_layer)
 
     Create a Missile instance.
     A Missile is a player capable of updating its acceleration based on a certain guidance law and 
@@ -73,17 +83,20 @@ The Missile class
         * :samp:`pos`, :samp:`ori`, :samp:`vel`, :samp:`acc` with the same meaning of Player base 
            class;
 
-        * :samp:`update_fn` a function representing a desired guidance law used to update Missile
-          acceleration before the navigation integration step.
-          A valid :samp:`update_fn` is a Python function taking three arguments::
+        * :samp:`guidance_data` is a dictionary with 'guidance' and 'guidance_gain' keys:
+          'guidance' value must be a function representing a desired guidance law used to update
+          Missile acceleration before the navigation integration step.
+          A valid :samp:`guidance` function is a Python function taking three arguments::
 
-            def update_fn_example(obj, sensed, dt):
+            def guidance_example(obj, sensed, dt):
                 # do something to evaluate acceleration value
                 obj.acc = new_acceleration
 
           where :samp:`obj`, :samp:`sensed` and :samp:`dt` are respectively a reference to Missile 
           instance, a dictionary containing data returned by the sensor layer and integration step.
-          The aim of :samp:`update_fn` function should be updating :samp:`acc` object attribute.
+          The aim of :samp:`guidance` function should be updating :samp:`acc` object attribute.
+          'guidance_gain' value should be a number which will become available inside guidance
+          function as obj.guidance_gain attribute;
 
         * :samp:`sensors_layer` is a class modeling sensors' dynamics and noise.
           A valid :samp:`sensors_layer` is a Python class having a :samp:`get_data` method taking a 
@@ -99,10 +112,11 @@ The Missile class
                     return { 'position': player.pos + some_noise, 'acceleration': player.acc }
 
     """
-    def __init__(self, pos, ori, vel, acc, update_fn, sensors_layer):
+    def __init__(self, pos, ori, vel, acc, guidance_data, sensors_layer):
         Player.__init__(self, pos, ori, vel, acc)
         self.sensors_layer = sensors_layer()
-        self.update_acc =  types.MethodType(update_fn, self)
+        self.guidance_gain = guidance_data['guidance_gain']
+        self.update_acc = types.MethodType(guidance_data['guidance'], self)
 
 class Target(Player):
     """

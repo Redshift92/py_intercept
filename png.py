@@ -2,7 +2,7 @@
 # @Author: lorenzo
 # @Date:   2017-08-23 17:29:39
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-13 16:45:41
+# @Last Modified time: 2017-09-14 21:07:27
 
 """
 .. module:: png
@@ -31,10 +31,10 @@ def ppn(self, sensed, dt):
         self.los_angle = np.arctan2(tpos[1] - self.pos[1], tpos[0] - self.pos[0])
     try:
         self.closing_velocity = - (self.range - self.prev_range) / dt
-        self.los_rate  = (self.los_angle - self.prev_los_angle) / dt
+        self.los_rate = (self.los_angle - self.prev_los_angle) / dt
         if abs(np.cos(self.ori - self.los_angle)) > 0.01:
-            self.acc = ((5/(np.cos(self.ori - self.los_angle))) *
-                         self.closing_velocity * self.los_rate)
+            N = self.guidance_gain / np.cos(self.ori - self.los_angle)
+            self.acc = (N * self.closing_velocity * self.los_rate)
     except AttributeError:
         pass
     finally:
@@ -54,10 +54,10 @@ def apng(self, sensed, dt):
         self.los_angle = np.arctan2(tpos[1] - self.pos[1], tpos[0] - self.pos[0])
     try:
         self.closing_velocity = - (self.range - self.prev_range) / dt
-        self.los_rate  = (self.los_angle - self.prev_los_angle) / dt
+        self.los_rate = (self.los_angle - self.prev_los_angle) / dt
         if abs(np.cos(self.ori - self.los_angle)) > 0.01:
-            self.acc = ((5/(np.cos(self.ori - self.los_angle))) *
-                         self.closing_velocity * self.los_rate) + 2.5*tacc
+            N = self.guidance_gain / np.cos(self.ori - self.los_angle)
+            self.acc = (N * self.closing_velocity * self.los_rate) + (N/2)*tacc
     except AttributeError:
         pass
     finally:

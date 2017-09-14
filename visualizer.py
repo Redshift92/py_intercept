@@ -2,7 +2,7 @@
 # @Author: lorenzo
 # @Date:   2017-09-09 10:09:40
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-13 16:39:21
+# @Last Modified time: 2017-09-13 16:56:22
 
 
 """
@@ -200,7 +200,7 @@ The SimScreen class
 
         """
         textsurface = self._font.render(text, False, (0, 0, 0))
-        self._screen.blit(textsurface, (20, int(self._font_size * 1.7) * (level + 1) ))
+        self._screen.blit(textsurface, (20, int(self._font_size * 1.7) * (level + 1)))
 
     def blit_center(self, psurf, cntr_pos, ori):
         """
@@ -227,7 +227,7 @@ The SimScreen class
             else:
                 trc, brc = Point((pxh, pyh)).rotate(ori), Point((pxh, -pyh)).rotate(ori)
                 top_left += Point((abs(-pxh - trc.coords[0]), -pyh + brc.coords[1]))
-        self._screen.blit(psurf.surf, self._pgs2ss_coords( top_left ) )
+        self._screen.blit(psurf.surf, self._pgs2ss_coords(top_left))
 
 def event_type(event):
     """
