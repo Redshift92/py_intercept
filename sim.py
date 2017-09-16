@@ -2,7 +2,7 @@
 # @Author: lorenzo
 # @Date:   2017-08-21 13:24:31
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-14 20:27:09
+# @Last Modified time: 2017-09-16 12:22:39
 
 """
 
@@ -34,13 +34,14 @@ class Simulator:
 The Simulator class
 ===================
 
-.. class:: Simulator(sscreen, plt, m0, t0, dt, rtf, tol, player_dim=(50,10))
+.. class:: Simulator(sscreen, plt_event, m0, t0, dt, rtf, tol, player_dim=(50,10))
 
     Create a Simulator instance.
     To have the Simulator correctly running the following parameters are needed:
 
         * :samp:`sscreen` SimScreen instance to output Simulation animation;
-        * :samp:`plt`  Plotter instance to output Simulation data;
+        * :samp:`plt_event`  Plotter instance pyqtSignal event needed to update Plotter plts from
+          a different thread;
         * :samp:`m0` Missile configuration info passed as a dictionary composed of the following keys:
           ['pos', 'he', 'vel', 'guidance'] paired respectively with an (x,y) start position tuple,
           heading error angle in degrees, start velocity and a string for desired guidance method;
@@ -57,9 +58,9 @@ The Simulator class
           pixels. 
 
     """
-    def __init__(self, sscreen, plt, m0, t0, dt, rtf, tol, player_dim=(50,10)):
+    def __init__(self, sscreen, plt_event, m0, t0, dt, rtf, tol, player_dim=(50,10)):
         self._sscreen = sscreen
-        self._plt = plt
+        self._plt_event = plt_event
         self.dt = dt
         self.realtime_factor = rtf
         self.tolerance = tol
@@ -142,8 +143,8 @@ The Simulator class
                 if hasattr(self.m['player'], los_d):
                     dh.history[los_d].append(round(getattr(self.m['player'], los_d), 5))
 
-            for plt_id in plt.plots():
-                plt.set_data(plt_id, dh.history[plt_id])
+            # update plot with new data
+            self._plt_event.emit(dh.history)
 
             self._sscreen.display_text('> missile acceleration: ' + 
                                        str(round(self.m['player'].acc, 2)))
@@ -158,7 +159,7 @@ The Simulator class
                 break
 
         self.quit_event.wait()
-        self._plt.quit()
+        self._plt_event.emit({'quit': 'now'})
 
     def key_listener(self):
         """
@@ -221,16 +222,29 @@ parser.add_argument('-tv', '--targetvel', dest='t0vel', type=int,
 parser.add_argument('-ta', '--targetacc', dest='t0acc', type=int,
                     metavar='acceleration', help='target acceleration', default=0)
 
+# parse command line arguments
 args = parser.parse_args()
 
+# since simulator loop runs on a separate thread from Plotter qt app, plt_update_fn is written
+# to be called every time a plt_event is emitted inside simulator loop (see dh.Plotter docs)
+def plt_update_fn(self, history):
+    if 'quit' in history:
+        self.quit()
+        return
+
+    for plt_id in self.plots():
+        self.set_data(plt_id, history[plt_id])
+
+# prepare plots
 data_ids = ['acc', 'los_rate', 'los_angle', 'los', 'closing_velocity']
-plt = dh.Plotter('Data Plotting', (800,800))
+plt = dh.Plotter('Data Plotting', (800,800), plt_update_fn)
 plt.add_plots([[data_ids[0], 'Missile Acceleration Plot', ['y']],
                [data_ids[1], 'Los Rate Plot', ['y']],
                'next_row',
                [data_ids[2], 'Los Angle Plot', ['y']],
                [data_ids[4], 'Closing Velocity Plot', ['y']]])
 
+# prepare logging slots
 dh.make_history(data_ids)
 
 m0 = {
@@ -248,7 +262,7 @@ t0 = {
 }
 
 sscreen = viz.SimScreen((800, 600), 15)
-simulator = Simulator(sscreen, plt, m0, t0, dt = 0.005, rtf = 0.5, tol = 0.5)
+simulator = Simulator(sscreen, plt.pc.plot_event, m0, t0, dt = 0.005, rtf = 0.5, tol = 0.5)
 
 threading.Thread(target=simulator.key_listener).start()
 threading.Thread(target=simulator.loop).start()

@@ -2,7 +2,7 @@
 # @Author: lorenzo
 # @Date:   2017-08-29 21:10:17
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-12 19:41:18
+# @Last Modified time: 2017-09-16 12:19:49
 
 """
 .. module:: data_handlers
@@ -18,23 +18,54 @@ Handle useful simulation data: plot and keep history.
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
 
+class PlotterChannel(pg.QtCore.QObject):
+    plot_event = pg.Qt.QtCore.pyqtSignal(dict)
+
 class Plotter:
     """
 =================
 The Plotter class
 =================
 
-.. class:: Plotter(title, size)
+.. class:: Plotter(title, size, update_fn = None)
 
         Creates a Plotter instance with window title :samp:`title` and window size :samp:`size`.
 
+        To update Plotter plots from a different thread than the one executing Qt Plotter app,
+        :samp:`update_fn` function is needed.
+        This function is connected to Plotter.pc.plot_event pyqtSignal and will receive Plotter
+        instance and emit call argument as parameters (emit argument must be a dict).
+
+        Example update_fn and plot_event call::
+
+            def my_update_fn(plotter, msg):
+                plotter.set_data(msg['new_data']['id'], msg['new_data']['data'])
+
+            def update_from_diff_thread():
+                while True:
+                    ...
+                    my_plt.pc.plot_event({ 'new_data': { 'id': 'my_data', 'data': my_data }})
+                    ...
+
+            ...
+            my_plt = Plotter('nice_title', (400,400), my_update_fn)
+            threading.Thread(target=update_from_diff_thread).start()
     """
-    def __init__(self, title, size):
+    def __init__(self, title, size, update_fn = None):
         self._win = pg.GraphicsWindow(title=title)
         self._win.resize(*size)
         self._plots = {}
         self._curves = {}
         self._app_inst = QtGui.QApplication.instance()
+
+        self.pc = PlotterChannel()
+
+        self.update_fn = update_fn
+        self.pc.plot_event.connect(self._update_fn)
+
+    def _update_fn(self, msg):
+        if self.update_fn is not None:
+            self.update_fn(self, msg)
 
     def add_plots(self, plots_list):
         """
