@@ -2,7 +2,18 @@
 # @Author: lorenzo
 # @Date:   2017-08-29 21:10:17
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-16 12:19:49
+# @Last Modified time: 2017-09-17 16:09:14
+
+# Copyright 2017 Lorenzo Rizzello
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 
 """
 .. module:: data_handlers
@@ -27,7 +38,7 @@ class Plotter:
 The Plotter class
 =================
 
-.. class:: Plotter(title, size, update_fn = None)
+.. class:: Plotter(title, size, update_fn=None)
 
         Creates a Plotter instance with window title :samp:`title` and window size :samp:`size`.
 
@@ -51,7 +62,7 @@ The Plotter class
             my_plt = Plotter('nice_title', (400,400), my_update_fn)
             threading.Thread(target=update_from_diff_thread).start()
     """
-    def __init__(self, title, size, update_fn = None):
+    def __init__(self, title, size, update_fn=None):
         self._win = pg.GraphicsWindow(title=title)
         self._win.resize(*size)
         self._plots = {}

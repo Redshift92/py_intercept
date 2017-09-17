@@ -2,7 +2,18 @@
 # @Author: lorenzo
 # @Date:   2017-08-21 13:24:31
 # @Last Modified by:   Lorenzo
-# @Last Modified time: 2017-09-16 12:22:39
+# @Last Modified time: 2017-09-17 16:09:47
+
+# Copyright 2017 Lorenzo Rizzello
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
@@ -11,6 +22,14 @@ Simulator
 *********
 
 Simulate a missile-target intercept scenario.
+
+To run default simulation::
+
+    python sim.py
+
+For simulation configuration options::
+
+    python sim.py --help
 
     """
 
